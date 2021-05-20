@@ -1,17 +1,8 @@
 plugins {
-    //id 'org.jetbrains.kotlin.jvm'
-    //id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
     id 'java-library'
-    //id 'kotlin'
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.kotlin.plugin.serialization'
-    //id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
-    //id 'kotlinx-serialization'
 }
-
-//apply plugin: 'java-library'
-//apply plugin: 'org.jetbrains.kotlin.jvm'
-//apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 
 repositories {
     mavenCentral()

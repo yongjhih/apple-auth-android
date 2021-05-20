@@ -13,13 +13,15 @@ import retrofit2.http.POST
  * See Also: https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens
  * See Also: https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/authenticating_users_with_sign_in_with_apple
  * See Also: https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/verifying_a_user
- * ```
- * val retrofit = Retrofit.Builder()
+ *
+ * ```kotlin
+ * val appleAuth = Retrofit.Builder()
  *   .baseUrl("https://appleid.apple.com/")
  *   .build()
+ *   .create<AppleAuth>()
  * ```
  *
- * ```
+ * ```sh
  * curl -v POST "https://appleid.apple.com/auth/token" \
  *   -H 'content-type: application/x-www-form-urlencoded' \
  *   -d 'client_id=CLIENT_ID' \
