@@ -2,6 +2,7 @@ package auth.apple.app.ui.login
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -18,6 +19,7 @@ import auth.apple.app.R
 import auth.apple.app.databinding.ActivityLoginBinding
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.NotificationParams
 
 class LoginActivity : AppCompatActivity() {
 
@@ -101,7 +103,7 @@ class LoginActivity : AppCompatActivity() {
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Log.w("Login", "Fetching FCM registration token failed", task.exception)
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
 
@@ -110,11 +112,11 @@ class LoginActivity : AppCompatActivity() {
 
             // Log and toast
             val msg = "Yo"
-            Log.d("Login", msg)
+            Log.d(TAG, msg)
             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
         })
 
-        Log.d("Login", "onCreate")
+        Log.d(TAG, "onCreate")
         onIntent(intent)
     }
 
@@ -129,26 +131,30 @@ class LoginActivity : AppCompatActivity() {
     //Login: onIntent: intent?.extras?.keySet().forEach: 7: collapse_key
     //Login: onIntent: intent?.action: android.intent.action.MAIN
     //Login: Yo
-
     private fun onIntent(intent: Intent?) {
-        Log.d("Login", "onIntent: intent?.extras?.keySet(): ${intent?.extras?.keySet()}")
-        Log.d("Login", "onIntent: intent?.action: ${intent?.action}")
-        intent?.extras?.keySet()?.forEachIndexed { i, it ->
-            Log.d("Login", "onIntent: intent?.extras?.keySet().forEach: ${i}: ${it}")
+        Log.d(TAG, "onIntent: intent?.extras?.keySet(): ${intent?.extras?.keySet()}")
+        Log.d(TAG, "onIntent: intent?.action: ${intent?.action}")
+        if (intent?.extras?.isFromNotification() == true) {
+            Log.d(TAG, "isFromNotification: intent?.extras?.keySet()?.containsAny notification")
         }
-        if (intent?.extras?.keySet()?.containsAny(
-                "messageId",
-                "google.message_id",
-                "message_id",
-                "notification",
-            ) == true) {
-            Log.d("Login", "onIntent: intent?.extras?.keySet()?.containsAny notification")
+    }
+
+    private fun Bundle.isFromNotification(): Boolean {
+        keySet().forEachIndexed { i, it ->
+            Log.d(TAG, "isFromNotification: keySet().forEach: ${i}: ${it}")
         }
+
+        return keySet().containsAny(
+            "messageId",
+            "google.message_id",
+            "message_id",
+            "notification",
+        )
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        Log.d("Login", "onNewIntent")
+        Log.d(TAG, "onNewIntent")
 
         onIntent(intent)
     }
@@ -198,3 +204,16 @@ fun <T> Collection<T>.containsAny(elements: Collection<T>): Boolean {
     val set = if (elements is Set) elements else elements.toSet()
     return any(set::contains)
 }
+
+val Any.TAG: String
+    get() {
+        return if (!javaClass.isAnonymousClass) {
+            val name = javaClass.simpleName
+            if (name.length <= 23 || Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) name else
+                name.substring(0, 23)// first 23 chars
+        } else {
+            val name = javaClass.name
+            if (name.length <= 23 || Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                name else name.substring(name.length - 23, name.length)// last 23 chars
+        }
+    }
